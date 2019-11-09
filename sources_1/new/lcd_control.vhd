@@ -4,7 +4,7 @@ use IEEE.NUMERIC_STD.ALL;
 use ieee.std_logic_arith.all;
 
 entity lcd_control is
-    generic(mystring : string := "Hello World!");
+    generic(mystring : string := "ABCDE");
     port(
         clk : in std_logic; --50Mhz Clock
         RS : out std_logic; --Instruction / Data Register Selection
@@ -26,7 +26,7 @@ architecture Behavioral of lcd_control is
     signal data_bus: STD_LOGIC_VECTOR(7 downto 0);
     signal clk_400: std_logic;
     signal clk_count: integer range 0 to 62500;
-    signal index : integer range 0 to mystring'length-1;
+    signal index : integer range 1 to mystring'length;
 begin
 
 DB <= data_bus when RW = '0' else "ZZZZZZZZ";
@@ -45,16 +45,9 @@ begin
     end if;
 end process;
 
---STATE_REGISTER: process(clk_400)
---begin
---    if rising_edge(clk_400) then
---        state <= next_state;
---    end if;
---end process;
 
 STATE_MACHINE: process (clk_400)
 begin
---    next_state <= state;
     if rising_edge(clk_400) then
     case state is
     when FUNCTION_SET =>
@@ -79,13 +72,13 @@ begin
         next_state <= WRITE_CHAR;
     when WRITE_CHAR =>
         RS <= '1'; RW <= '0'; EN <= '1';
-        data_bus <= std_logic_vector(to_unsigned(natural(character'pos( mystring(index) )), 8)) ;
+        data_bus <= std_logic_vector(to_unsigned( natural( character'pos( mystring(index) ) ), 8) ) ;
         state <= toggle_e;
-        if index < mystring'length-1 then
+        if (index < mystring'length) then
             index <= index + 1;
-            next_state <= WRITE_CHAR;  
+            next_state <= WRITE_CHAR;
         else
-            index <= 0;
+            index <= 1;
             next_state <= RETURN_HOME;
         end if;
     when RETURN_HOME =>
