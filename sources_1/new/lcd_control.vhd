@@ -29,7 +29,7 @@ architecture Behavioral of lcd_control is
     signal next_state: LCD_STATES;
     signal data_bus: STD_LOGIC_VECTOR(7 downto 0);
     signal clk2: std_logic;
-    signal clk_count: integer range 0 to 24000; --50Mhz / 400hz / 2 = 62500
+    signal clk_count: integer range 0 to 62500; --50Mhz / 400hz / 2 = 62500
     signal index : integer range 1 to mystring'length;
 begin
 
@@ -40,7 +40,7 @@ RST <= '1'; --reset active low
 CLK_DIV_400HZ: process(clk)
 begin
     if rising_edge(clk) then
-        if clk_count < 24000 then
+        if clk_count < 62500 then
             clk_count <= clk_count + 1;
         else
             clk_count <= 0;
